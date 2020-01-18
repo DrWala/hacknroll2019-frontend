@@ -7,6 +7,8 @@
     {{my_questions}}
     {{my_answer}}
     <canvas id="stat-chart"></canvas>
+    <canvas id="scat-chart"></canvas>
+
   </div>
 </template>
 
@@ -30,29 +32,24 @@ export default {
     this.getUserAnswer();
     // construct what you think data should look like for your chart
     let mythischart = {
-      type: "line",
+      type: "bar",
       data: {
         labels: [ // change this
           "Mercury",
           "Venus",
           "Earth",
-          "Mars",
-          "Jupiter",
-          "Saturn",
-          "Uranus",
-          "Neptune"
         ],
         datasets: [
           {
             //change this
             label: "Number of Moons",
-            data: [3, 0, 1, 2, 67, 62, 27, 14]
+            data: [15, 0, 1, 2]
           }
         ]
       },
       options: {
         responsive: true,
-        lineTension: 1,
+        lineTension: 100,
         scales: {
           yAxes: [
             {
@@ -66,6 +63,33 @@ export default {
       }
     };
     this.createChart("stat-chart", mythischart);
+    let mythatchart = {
+      type: 'scatter',
+      data: {
+          datasets: [{
+              label: 'Scatter Dataset',
+              data: [{
+                  x: -10,
+                  y: 0
+              }, {
+                  x: 0,
+                  y: 10
+              }, {
+                  x: 10,
+                  y: 5
+              }]
+          }]
+      },
+      options: {
+          scales: {
+              xAxes: [{
+                  type: 'linear',
+                  position: 'bottom'
+              }]
+          }
+      }
+      };
+      this.createChart("scat-chart", mythatchart);
   },
   methods: {
     getData() {

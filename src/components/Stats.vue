@@ -1,6 +1,12 @@
 <template>
     <div id="app">
-        <canvas id="scat-chart"></canvas>
+        <h1>Welcome to your check-in</h1>
+        <canvas id="chart_1"></canvas>
+        <canvas id="chart_2"></canvas>
+        <canvas id="chart_3"></canvas>
+        <canvas id="chart_4"></canvas>
+        <canvas id="chart_5"></canvas>
+        <canvas id="chart_6"></canvas>
     </div>
 </template>
 
@@ -10,9 +16,11 @@ export default {
     name: "app",
     data() {
         return {
+            user_id: null,
             my_variable: "hello!",
             my_questions: null,
             my_answer: "test",
+            all_questions: null,
             chart_format: {
                 type: "line",
                 data: {
@@ -49,28 +57,40 @@ export default {
     },
     mounted() {
         //to implement the method we implemented below
+        let uri = window.location.search.substring(1);
+        let params = new URLSearchParams(uri);
+        this.user_id = params.get("user_id");
         this.getData();
         this.getUserQuestion();
         this.getUserAnswer();
+        this.getAllPresetQuestions()
     },
     methods: {
         getData() {
             //return dob and gender
-            this.$database.get_user(1, d => (this.my_variable = d.val()));
+            this.$database.get_user(
+                this.user_id,
+                d => (this.my_variable = d.val())
+            );
         },
         getUserQuestion() {
             this.$database.get_user_question_by_id(
-                1,
+                this.user_id,
                 1,
                 d => (this.my_questions = d.val())
             );
         },
         getUserAnswer() {
-            this.$database.get_user_answers(1, d => {
+            this.$database.get_user_answers(this.user_id, d => {
                 this.my_answer = d.val();
                 let formatted_ans = this.formatData(this.my_answer);
                 console.log(formatted_ans);
-                this.createChartObject(formatted_ans);
+                this.createChartObject("chart_1", 0, formatted_ans);
+                this.createChartObject("chart_2", 1, formatted_ans);
+                this.createChartObject("chart_3", 2, formatted_ans);
+                this.createChartObject("chart_4", 3, formatted_ans);
+                this.createChartObject("chart_5", 4, formatted_ans);
+                this.createChartObject("chart_6", 5, formatted_ans);
             });
         },
         createChart(chartId, chartData) {
@@ -97,12 +117,15 @@ export default {
             };
             return chart_info;
         },
-        createChartObject(formatted_data) {
+        getAllPresetQuestions() {
+            this.$database.get_preset_questions(d => this.all_questions = d.val());
+        },
+        createChartObject(chart_name, arr_id, formatted_data) {
             // Deep copy the chart formatting
             let chart_object = JSON.parse(JSON.stringify(this.chart_format));
-            chart_object.data.datasets[0].data = formatted_data.chart_data[0];
+            chart_object.data.datasets[0].data = formatted_data.chart_data[arr_id];
             chart_object.data.labels = formatted_data.labels;
-            this.createChart("scat-chart", chart_object);
+            this.createChart(chart_name, chart_object);
         }
     }
 };

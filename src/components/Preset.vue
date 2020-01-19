@@ -1,16 +1,22 @@
 <template>
-    <div id="app"></div>
+    <div id="app">
+        <h1>Preset questions</h1>
+        <canvas id="scat-chart"></canvas>
+    </div>
 </template>
 
 <script>
-
+import Chart from "chart.js";
 export default {
     name: "app",
-    data() {return {
-
-	}},
-    mounted() {},
-    methods: {},	
+    data() {
+        return {
+        };
+    },
+    mounted() {
+    },
+    methods: {
+    }
 };
 </script>
 

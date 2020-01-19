@@ -1,10 +1,11 @@
 <template>
   <div id="app">
+    <h1>Thanks for the Check-In</h1>
     <!-- <router-view></router-view> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
     <!-- {{my_variable}} -->
-    <!-- {{my_questions}} -->
-    {{my_answer}}
+    {{my_questions}}
+    <!-- {{my_answer}} -->
     <!-- <canvas id="stat-chart"></canvas> -->
     <canvas id="scat-chart"></canvas>
   </div>
@@ -36,9 +37,9 @@ export default {
           ],
           datasets: [
             {
-              //change this
-              label: "Frequency of Mood",
-              data: [100, 40, 60]
+              // //change this
+              // label: "Frequency of Mood",
+              // data: [100, 40, 60]
             }
           ]
         },
@@ -127,6 +128,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  padding-left: 200px;
+  padding-right: 200px;
+  /* padding-top: 50px;  */
 }
 </style>

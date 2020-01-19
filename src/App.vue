@@ -1,20 +1,22 @@
 <template>
   <div id="app">
     <!-- <router-view></router-view> -->
-    <img alt="Vue logo" src="./assets/logo.png" />
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
-    {{my_variable}}
-    {{my_questions}}
+    <!-- {{my_variable}} -->
+    <!-- {{my_questions}} -->
     {{my_answer}}
-    <canvas id="stat-chart"></canvas>
+    <!-- <canvas id="stat-chart"></canvas> -->
     <canvas id="scat-chart"></canvas>
-
   </div>
 </template>
 
 <script>
 import Chart from "chart.js";
-import planetChartData from "./planet-chart.js";
+// import planetChartData from "./planet-chart.js";
+
+// var dateObj = new Date(my_answer*1000)
+// var time = dateObj.toUTCString().slice(-11, -4)
+// console.log(getUserAnswer.keys());
 
 export default {
   name: "app",
@@ -22,7 +24,39 @@ export default {
     return {
       my_variable: "hello!",
       my_questions: null,
-      my_answer: "test"
+      my_answer: "test",
+      chart_format: {
+        type: "line",
+        data: {
+          labels: [
+            // change this
+            "Sad",
+            "Ok I guess",
+            "Happy"
+          ],
+          datasets: [
+            {
+              //change this
+              label: "Frequency of Mood",
+              data: [100, 40, 60]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          lineTension: 100,
+          scales: {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                  padding: 25
+                }
+              }
+            ]
+          }
+        }
+      }
     };
   },
   mounted() {
@@ -30,66 +64,6 @@ export default {
     this.getData();
     this.getUserQuestion();
     this.getUserAnswer();
-    // construct what you think data should look like for your chart
-    let mythischart = {
-      type: "bar",
-      data: {
-        labels: [ // change this
-          "Mercury",
-          "Venus",
-          "Earth",
-        ],
-        datasets: [
-          {
-            //change this
-            label: "Number of Moons",
-            data: [15, 0, 1, 2]
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        lineTension: 100,
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                padding: 25
-              }
-            }
-          ]
-        }
-      }
-    };
-    this.createChart("stat-chart", mythischart);
-    let mythatchart = {
-      type: 'scatter',
-      data: {
-          datasets: [{
-              label: 'Scatter Dataset',
-              data: [{
-                  x: -10,
-                  y: 0
-              }, {
-                  x: 0,
-                  y: 10
-              }, {
-                  x: 10,
-                  y: 5
-              }]
-          }]
-      },
-      options: {
-          scales: {
-              xAxes: [{
-                  type: 'linear',
-                  position: 'bottom'
-              }]
-          }
-      }
-      };
-      this.createChart("scat-chart", mythatchart);
   },
   methods: {
     getData() {
@@ -104,7 +78,12 @@ export default {
       );
     },
     getUserAnswer() {
-      this.$database.get_user_answers(1, d => (this.my_answer = d.val()));
+      this.$database.get_user_answers(1, d => {
+        this.my_answer = d.val();
+        let formatted_ans = this.formatData(this.my_answer);
+        console.log(formatted_ans);
+        this.createChartObject(formatted_ans);
+      });
     },
     createChart(chartId, chartData) {
       const ctx = document.getElementById(chartId);
@@ -113,6 +92,29 @@ export default {
         data: chartData.data,
         options: chartData.options
       });
+    },
+    formatData(user_answers) {
+      let list_of_questions = ["1", "2", "3"];
+      let all_keys = Object.keys(user_answers); //time
+      let all_answers = Object.values(user_answers); //answers
+      let chart_data = [];
+      list_of_questions.forEach(q => {
+        if (chart_data[q] === undefined) {
+          chart_data[q] = all_answers.map(ans => ans[q]);
+        }
+      });
+      let chart_info = {
+        chart_data: chart_data.filter(el => el != null),
+        labels: all_keys
+      };
+      return chart_info;
+    },
+    createChartObject(formatted_data) {
+      // Deep copy the chart formatting
+      let chart_object = JSON.parse(JSON.stringify(this.chart_format));
+      chart_object.data.datasets[0].data = formatted_data.chart_data[0];
+      chart_object.data.labels = formatted_data.labels;
+      this.createChart("scat-chart", chart_object);
     }
   }
 };
